@@ -6,13 +6,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
     ServerSocket server;
-    List<ClientHandler> clients = new CopyOnWriteArrayList<ClientHandler>();
+    List<ClientHandler> clients = new CopyOnWriteArrayList<>();
     Socket socket;
 
     public Server(int port){
         try{
             //creating a server
-            server =new ServerSocket();
+            server =new ServerSocket(port);
+            System.out.println("Server is listening on port "+port);
             //listening to any clients that connects
             while(true){
                 socket = server.accept();
@@ -38,6 +39,7 @@ public class Server {
 
     public void removeClient(ClientHandler c){
         clients.remove(c);
+        System.out.println("a client disconnected");
     }
 
     public void closeServer(){
@@ -48,6 +50,10 @@ public class Server {
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        Server server = new Server(5000);
     }
 }
 
@@ -73,18 +79,17 @@ class ClientHandler implements Runnable{
         }catch(IOException e){
             e.printStackTrace();
         }finally {
-            close();
+            this.close();
         }
     }
     public void sendMsg(String msg){
         try{
             bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             bw.write(msg);
+            bw.newLine();
             bw.flush();
         }catch(IOException e){
             e.printStackTrace();
-        }finally {
-            close();
         }
     }
     public void close() {
